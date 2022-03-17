@@ -1,16 +1,27 @@
 const { gameList, allowedMoves, winningMoves } = require("../game");
+const { v4: uuidv4 } = require("uuid");
 
-//TODO: Functions for validating data in the game. Functions for retreiving game and players for readability and also middleware for validating, refactor this from the controller functions
-
+/**
+ * Checks if a given player exists in a given game
+ * @param {*} gameID
+ * @param {*} playerName
+ * @returns True if player exists, otherwise false
+ */
 const playerExists = (gameID, playerName) => {
-    const foundGame = gameList.find((game) => game.id === gameID);
+    const foundGame = getGame(gameID);
     return foundGame.players.find((player) => player.name === playerName)
         ? true
         : false;
 };
 
-const validateFields = (body, fields) => {
-    for (const field of fields) {
+/**
+ * Validates that the given fields exist in the given body
+ * @param {*} body  JSON object
+ * @param {*} requiredFields    Array of fieldnames that are required, eg.     ['name','id']
+ * @returns True if fields exist
+ */
+const validateFields = (body, requiredFields) => {
+    for (const field of requiredFields) {
         if (!body.hasOwnProperty(field)) {
             return false;
         }
@@ -18,25 +29,112 @@ const validateFields = (body, fields) => {
     return true;
 };
 
+/**
+ * Checks if there are any active games
+ * @param {*} gameList
+ * @returns True if there are any games in the list, false otherwise
+ */
 const gamesExist = (gameList) => {
     return gameList.length > 0 ? true : false;
 };
 
+/**
+ * Returns a game that matches the given ID
+ * @param {*} gameID
+ * @returns a game that matches the given ID
+ */
+const getGame = (gameID) => {
+    return (foundGame = gameList.find((game) => game.id === gameID));
+};
+
+/**
+ * Returns a player with the given name
+ * @param {*} game  Game object
+ * @param {*} playerName
+ * @param {*} opponent  Boolean - if it should return opponent instead
+ * @returns A player with the given name
+ */
+function getPlayer(game, playerName, opponent) {
+    if (opponent) {
+        return game.players.find((player) => player.name !== playerName);
+    }
+    return game.players.find((player) => player.name === playerName);
+}
+
+/**
+ * Creates a new game and adds it to the list of games
+ * @param {*} playerName    The player who started the game
+ * @returns The ID of the new game
+ */
+const createGame = (playerName) => {
+    const uuid = uuidv4();
+    gameList.push({ id: uuid, players: [{ name: playerName, move: "" }] });
+    return uuid;
+};
+
+/**
+ * Checks if a game with a given ID exists
+ * @param {*} gameID
+ * @returns True if exists, false otherwise
+ */
 const gameIDExists = (gameID) => {
-    const foundGame = gameList.find((game) => game.id === gameID);
+    const foundGame = getGame(gameID);
     return foundGame !== undefined ? true : false;
 };
 
-const calculateResult = (gameID, playerName) => {
-    //Also check that there are any players in the first place
+/**
+ * Checks that the number of players isn't equal to or larger than 2
+ * @param {*} gameID
+ * @returns True if smaller than 2, false otherwise
+ */
+const validateNumberOfPlayers = (gameID) => {
+    const foundGame = getGame(gameID);
+    if (foundGame.players.length >= 2) {
+        return false;
+    }
+    return true;
+};
 
-    const foundGame = gameList.find((game) => game.id === gameID);
-    const foundPlayer = foundGame.players.find(
-        (player) => player.name === playerName
-    );
-    const opponent = foundGame.players.find(
-        (player) => player.name !== playerName
-    );
+/**
+ * Adds a player to a game with the given ID
+ * @param {*} gameID
+ * @param {*} playerName
+ */
+const joinGame = (gameID, playerName) => {
+    const foundGame = getGame(gameID);
+    foundGame.players.push({ name: playerName, move: "" });
+};
+
+/**
+ * Plays a move for a given player
+ * @param {*} gameID
+ * @param {*} playerName
+ * @param {*} move
+ * @returns A success message if move is valid, error message if not
+ */
+const playMove = (gameID, playerName, move) => {
+    const foundGame = getGame(gameID);
+    const foundPlayer = getPlayer(foundGame, playerName);
+    if (foundPlayer.move !== "") {
+        return "Player already played a move!";
+    }
+    if (!allowedMoves.includes(move)) {
+        return "Player tried to play an illegal move, check your spelling and try again!";
+    }
+    foundPlayer.move = move;
+    return `${playerName} played ${move}!`;
+};
+
+/**
+ * Calculates the result of a given game and returns the response
+ * @param {*} gameID
+ * @param {*} playerName    The player who checks the results
+ * @returns A message containing the result of the game
+ */
+const calculateResult = (gameID, playerName) => {
+    const foundGame = getGame(gameID);
+    const foundPlayer = getPlayer(foundGame, playerName);
+    const opponent = getPlayer(foundGame, playerName, true);
     for (const player of foundGame.players) {
         if (player.move == "" || foundGame.players.length !== 2) {
             //maybe not hardcode 2
@@ -56,53 +154,6 @@ const calculateResult = (gameID, playerName) => {
     /*  if (foundGame.players.map((player) => player.move === "")) {
         return "All players need to play a move before the results can be calculated!";
     } */
-};
-
-//Maybe unecessary to check if exists again but just to be sure that it cant break the wole thing
-const getGame = (gameID) => {
-    return (foundGame = gameList.find((game) => game.id === gameID));
-
-    /* Alternatively, since its the exact same thing, maybe returning something else is better practice?
-    if (gameIDExists(gameID)) {
-        const foundGame = gameList.find((game) => game.id == gameID);
-        return foundGame
-    }
-    return undefined 
-    */
-};
-
-const createGame = (playerName) => {
-    const uuid = uuidv4();
-    gameList.push({ id: uuid, players: [{ name: playerName, move: "" }] });
-    return uuid;
-};
-
-const validateNumberOfPlayers = (gameID) => {
-    const foundGame = gameList.find((game) => game.id === gameID);
-    if (foundGame.players.length >= 2) {
-        return false;
-    }
-    return true;
-};
-
-const joinGame = (gameID, playerName) => {
-    const foundGame = gameList.find((game) => game.id === gameID);
-    foundGame.players.push({ name: playerName, move: "" });
-};
-
-const playMove = (gameID, playerName, move) => {
-    const foundGame = gameList.find((game) => game.id === gameID);
-    const foundPlayer = foundGame.players.find(
-        (player) => player.name === playerName
-    );
-    if (foundPlayer.move !== "") {
-        return "Player already played a move!";
-    }
-    if (!allowedMoves.includes(move)) {
-        return "Player tried to play an illegal move, check your spelling and try again!";
-    }
-    foundPlayer.move = move;
-    return `${playerName} played ${move}!`;
 };
 
 module.exports = {

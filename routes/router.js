@@ -1,19 +1,40 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/controller");
+const gameController = require("../controllers/gameController");
+const {
+    assurePlayerName,
+    assureFields,
+} = require("../middleware/validationMiddleware");
 
-// router.use("/games");
+router.get("/games", gameController.getGames);
 
-router.get("/games", controller.getGames);
+router.get("/games/:id", gameController.getGameByID);
 
-router.get("/games/:id", controller.getGameByID);
+router.get(
+    "/games/:id/results",
+    assureFields(["name"]),
+    assurePlayerName,
+    gameController.getResults
+);
 
-router.get("/games/:id/results", controller.getResults);
+router.post(
+    "/games",
+    assureFields(["name"]),
+    assurePlayerName,
+    gameController.newGame
+);
 
-router.post("/games", controller.newGame); //getting game when making get request here, fix this pls future isak
+router.post(
+    "/games/:id/join",
+    assureFields(["name"]),
+    assurePlayerName,
+    gameController.joinGameByID
+);
 
-router.post("/games/:id/join", controller.joinGameByID);
-
-router.post("/games/:id/move", controller.makeMove);
+router.post(
+    "/games/:id/move",
+    assureFields(["name", "move"]),
+    gameController.makeMove
+);
 
 module.exports = router;

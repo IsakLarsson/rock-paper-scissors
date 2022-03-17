@@ -1,5 +1,4 @@
-/* const { gamesExist } = require("../functions/functions"); */
-const { v4: uuidv4, validate } = require("uuid");
+const { gameList } = require("../game");
 const {
     calculateResult,
     createGame,
@@ -9,10 +8,14 @@ const {
     joinGame,
     playMove,
     playerExists,
-    validateFields,
     validateNumberOfPlayers,
 } = require("../functions/functions");
 
+/**
+ * Gets the currently active games if there are any.
+ * @param {*} req   HTTP request
+ * @param {*} res   HTTP response
+ */
 const getGames = (req, res) => {
     if (gamesExist(gameList)) {
         res.json({ message: "Getting games", res: gameList });
@@ -23,6 +26,12 @@ const getGames = (req, res) => {
     }
 };
 
+/**
+ * Gets a specific game by its ID
+ * @param {*} req   HTTP request
+ * @param {*} res   HTTP response
+ * @returns
+ */
 const getGameByID = (req, res) => {
     const gameID = req.params.id;
     if (!gameIDExists(gameID)) {
@@ -36,43 +45,30 @@ const getGameByID = (req, res) => {
     }
 };
 
+/**
+ * Creates a new game of rock-paper-scissors
+ * @param {*} req   HTTP request
+ * @param {*} res   HTTP response
+ */
 const newGame = (req, res) => {
-    const body = req.body;
-    const requiredFields = ["name"];
-    if (!validateFields(body, requiredFields)) {
-        res.status(400).json({
-            message: `The request is missing a required field, the required fields are: ${requiredFields}`,
-        });
-        return;
-    }
+    const playerName = req.body.name;
 
-    const playerName = body.name;
-    if (playerName === "") {
-        res.status(400).json({
-            message: "The player name cannot be empty!",
-        });
-        return;
-    }
     const createdID = createGame(playerName);
     res.status(201).json({ message: `Created new game with ID: ${createdID}` });
 };
 
+/**
+ * Joins a specific game
+ * @param {*} req   HTTP request
+ * @param {*} res   HTTP response
+ * @returns
+ */
 const joinGameByID = (req, res) => {
     const gameID = req.params.id;
     const playerName = req.body.name;
-    //kolla om man hittar gamet ens
+
     if (!gameIDExists(gameID)) {
         res.status(404).json({ message: "No game with that ID was found" });
-        return;
-    }
-    /* if (!validate(gameID)) { 
-        res.status(400).json({ message: `The given ID is not valid!` });
-        return;
-    } */
-    if (playerName === "") {
-        res.status(400).json({
-            message: "The player name cannot be empty!",
-        });
         return;
     }
     if (!validateNumberOfPlayers(gameID)) {
@@ -89,17 +85,18 @@ const joinGameByID = (req, res) => {
     }
 };
 
+/**
+ * Registers a given legal move
+ * @param {*} req   HTTP request
+ * @param {*} res   HTTP response
+ * @returns
+ */
 const makeMove = (req, res) => {
     const gameID = req.params.id;
     const playerName = req.body.name;
-    const body = req.body;
-    const move = body.move;
-    const requiredFields = ["name", "move"];
-    //Better practice att flytta ner dessa deklarationer till efter valideringen?
-    if (!validateFields(body, requiredFields)) {
-        res.status(400).json({
-            message: `The request is missing a required field, the required fields are: ${requiredFields}`,
-        });
+    const move = req.body.move;
+    if (!gameIDExists(gameID)) {
+        res.status(404).json({ message: "No game with that ID was found" });
         return;
     }
     if (!playerExists(gameID, playerName)) {
@@ -112,19 +109,16 @@ const makeMove = (req, res) => {
     res.json({ message: moveResults });
 };
 
+/**
+ * Gets the results of a given game
+ * @param {*} req   HTTP request
+ * @param {*} res   HTTP response
+ * @returns
+ */
 const getResults = (req, res) => {
     const gameID = req.params.id;
-    const body = req.body;
     const playerName = req.body.name;
-    //Validera fields/id/playername
-    const requiredFields = ["name"];
 
-    if (!validateFields(body, requiredFields)) {
-        res.status(400).json({
-            message: `The request is missing a required field, the required fields are: ${requiredFields}`,
-        });
-        return;
-    }
     if (!playerExists(gameID, playerName)) {
         res.status(404).json({
             message: `Player ${playerName} was not found in this game!`,
@@ -139,8 +133,6 @@ const getResults = (req, res) => {
     const result = calculateResult(gameID, playerName);
     res.json({ message: result });
 };
-
-//FUNCTIONS
 
 module.exports = {
     getGames,
