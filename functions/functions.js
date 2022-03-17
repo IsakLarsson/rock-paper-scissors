@@ -1,10 +1,10 @@
-const { gameList, allowedMoves, winningMoves } = require("../game");
+const { gameList, allowedMoves, winningMoves } = require("../assets/game");
 const { v4: uuidv4 } = require("uuid");
 
 /**
  * Checks if a given player exists in a given game
- * @param {*} gameID
- * @param {*} playerName
+ * @param {string} gameID
+ * @param {string} playerName
  * @returns True if player exists, otherwise false
  */
 const playerExists = (gameID, playerName) => {
@@ -16,8 +16,8 @@ const playerExists = (gameID, playerName) => {
 
 /**
  * Validates that the given fields exist in the given body
- * @param {*} body  JSON object
- * @param {*} requiredFields    Array of fieldnames that are required, eg.     ['name','id']
+ * @param {Object} body  JSON object
+ * @param {Array<string>} requiredFields    Array of fieldnames that are required, eg.     ['name','id']
  * @returns True if fields exist
  */
 const validateFields = (body, requiredFields) => {
@@ -31,7 +31,7 @@ const validateFields = (body, requiredFields) => {
 
 /**
  * Checks if there are any active games
- * @param {*} gameList
+ * @param {Object[]} gameList
  * @returns True if there are any games in the list, false otherwise
  */
 const gamesExist = (gameList) => {
@@ -40,7 +40,7 @@ const gamesExist = (gameList) => {
 
 /**
  * Returns a game that matches the given ID
- * @param {*} gameID
+ * @param {string} gameID
  * @returns a game that matches the given ID
  */
 const getGame = (gameID) => {
@@ -49,9 +49,9 @@ const getGame = (gameID) => {
 
 /**
  * Returns a player with the given name
- * @param {*} game  Game object
- * @param {*} playerName
- * @param {*} opponent  Boolean - if it should return opponent instead
+ * @param {Object} game  Game object
+ * @param {string} playerName
+ * @param {Boolean} opponent  If it should return opponent instead
  * @returns A player with the given name
  */
 function getPlayer(game, playerName, opponent) {
@@ -63,7 +63,7 @@ function getPlayer(game, playerName, opponent) {
 
 /**
  * Creates a new game and adds it to the list of games
- * @param {*} playerName    The player who started the game
+ * @param {string} playerName    The player who started the game
  * @returns The ID of the new game
  */
 const createGame = (playerName) => {
@@ -74,7 +74,7 @@ const createGame = (playerName) => {
 
 /**
  * Checks if a game with a given ID exists
- * @param {*} gameID
+ * @param {string} gameID
  * @returns True if exists, false otherwise
  */
 const gameIDExists = (gameID) => {
@@ -84,7 +84,7 @@ const gameIDExists = (gameID) => {
 
 /**
  * Checks that the number of players isn't equal to or larger than 2
- * @param {*} gameID
+ * @param {string} gameID
  * @returns True if smaller than 2, false otherwise
  */
 const validateNumberOfPlayers = (gameID) => {
@@ -97,19 +97,24 @@ const validateNumberOfPlayers = (gameID) => {
 
 /**
  * Adds a player to a game with the given ID
- * @param {*} gameID
- * @param {*} playerName
+ * @param {string} gameID
+ * @param {string} playerName
  */
 const joinGame = (gameID, playerName) => {
     const foundGame = getGame(gameID);
+    if (playerExists(gameID, playerName)) {
+        throw new Error(
+            "There is already a player with this name in this game!"
+        );
+    }
     foundGame.players.push({ name: playerName, move: "" });
 };
 
 /**
  * Plays a move for a given player
- * @param {*} gameID
- * @param {*} playerName
- * @param {*} move
+ * @param {string} gameID
+ * @param {string} playerName
+ * @param {string} move
  * @returns A success message if move is valid, error message if not
  */
 const playMove = (gameID, playerName, move) => {
@@ -127,8 +132,8 @@ const playMove = (gameID, playerName, move) => {
 
 /**
  * Calculates the result of a given game and returns the response
- * @param {*} gameID
- * @param {*} playerName    The player who checks the results
+ * @param {string} gameID
+ * @param {string} playerName    The player who checks the results
  * @returns A message containing the result of the game
  */
 const calculateResult = (gameID, playerName) => {

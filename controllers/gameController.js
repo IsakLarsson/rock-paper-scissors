@@ -1,4 +1,4 @@
-const { gameList } = require("../game");
+const { gameList } = require("../assets/game");
 const {
     calculateResult,
     createGame,
@@ -35,8 +35,9 @@ const getGames = (req, res) => {
 const getGameByID = (req, res) => {
     const gameID = req.params.id;
     if (!gameIDExists(gameID)) {
-        res.status(404).json({ message: "No game with that ID was found" });
-        return;
+        return res
+            .status(404)
+            .json({ message: "No game with that ID was found" });
     } else {
         res.json({
             message: `Getting game by id ${req.params.id}`,
@@ -68,21 +69,26 @@ const joinGameByID = (req, res) => {
     const playerName = req.body.name;
 
     if (!gameIDExists(gameID)) {
-        res.status(404).json({ message: "No game with that ID was found" });
-        return;
+        return res
+            .status(404)
+            .json({ message: "No game with that ID was found" });
     }
     if (!validateNumberOfPlayers(gameID)) {
-        res.status(400).json({
+        return res.status(400).json({
             message: "The game already has two players!",
         });
-        return;
     }
-    if (gameIDExists(gameID)) {
+
+    try {
         joinGame(gameID, playerName);
-        res.status(201).json({
-            message: `${playerName} successfully joined game ${gameID}!`,
+    } catch (err) {
+        return res.status(400).json({
+            message: err.message,
         });
     }
+    res.status(201).json({
+        message: `${playerName} successfully joined game ${gameID}!`,
+    });
 };
 
 /**
@@ -96,14 +102,14 @@ const makeMove = (req, res) => {
     const playerName = req.body.name;
     const move = req.body.move;
     if (!gameIDExists(gameID)) {
-        res.status(404).json({ message: "No game with that ID was found" });
-        return;
+        return res
+            .status(404)
+            .json({ message: "No game with that ID was found" });
     }
     if (!playerExists(gameID, playerName)) {
-        res.status(404).json({
+        return res.status(404).json({
             message: `Player ${playerName} was not found in this game!`,
         });
-        return;
     }
     const moveResults = playMove(gameID, playerName, move);
     res.json({ message: moveResults });
@@ -119,15 +125,15 @@ const getResults = (req, res) => {
     const gameID = req.params.id;
     const playerName = req.body.name;
 
+    if (!gameIDExists(gameID)) {
+        return res
+            .status(404)
+            .json({ message: "No game with that ID was found" });
+    }
     if (!playerExists(gameID, playerName)) {
-        res.status(404).json({
+        return res.status(404).json({
             message: `Player ${playerName} was not found in this game!`,
         });
-        return;
-    }
-    if (!gameIDExists(gameID)) {
-        res.status(404).json({ message: "No game with that ID was found" });
-        return;
     }
 
     const result = calculateResult(gameID, playerName);

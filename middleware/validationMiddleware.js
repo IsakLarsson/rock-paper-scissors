@@ -9,10 +9,9 @@ const assureFields = (requiredFields) => {
     return (req, res, next) => {
         const body = req.body;
         if (!validateFields(body, requiredFields)) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: `The request is missing a required field, the required fields are: ${requiredFields}`,
             });
-            return;
         }
         next();
     };
@@ -28,10 +27,9 @@ const assureFields = (requiredFields) => {
 const assurePlayerName = (req, res, next) => {
     const playerName = req.body.name;
     if (playerName === "") {
-        res.status(400).json({
+        return res.status(400).json({
             message: "The player name cannot be empty!",
         });
-        return;
     }
     next();
 };
