@@ -7,15 +7,6 @@ Do you have a friend or colleague who you disagree with? This is the adult way o
 The rules are very simple, each player chooses one move: Rock, Paper or Scissors.  
 As we all know: **Rock** beats **Scissors**, **Scissors** beat **Paper**, and **Paper** beats **Rock**.
 
-## Game example
-1. Player 1 sends a request to create a new game and gets a game ID from the server
-2. Player 1 sends this ID to his challenger via any given means of communication
-3. Player 2 joins the game using the game ID
-4. Player 1 plays his/her move (Paper)
-5. Player 2 plays his/her move (Rock)
-6. Player 1 checks the results of the match and discovers that he/she has lost and is forever in shame
-7. Player 2 checks the results of the match and discovers that he/she won and lives forever in glory
-
 ## Setting up the game
 To install all the necessary dependencies, open your command line, navigate to the root of the project and run either of the following commands
 `npm install`
@@ -27,6 +18,17 @@ You can now proceed to make calls to the API using your preferred API testing so
 - wget
 - Postman
 - HTTPie
+
+## Game example
+1. Player 1 sends a request to create a new game and gets a game ID from the server
+2. Player 1 sends this ID to his challenger via any given means of communication
+3. Player 2 joins the game using the game ID
+4. Player 1 plays his/her move (Paper)
+5. Player 2 plays his/her move (Rock)
+6. Player 1 checks the results of the match and discovers that he/she has lost and is forever in shame
+7. Player 2 checks the results of the match and discovers that he/she won and lives forever in glory
+
+
 
 ## API calls and request requirements
 If the server setup has succeeded you can continue to the fun part, playing the actualy game. But how do you play? this section outlines the valid API calls and what is required in the body of each request.
@@ -78,7 +80,7 @@ Success response example:
     "message": "Kalle played Rock!"
 }
 ```
-###GET /api/games/{id}
+### GET /api/games/{id}
 This returns a specific game object containing its players and their moves, this does not require a request body
 
 ### Get /api/games
