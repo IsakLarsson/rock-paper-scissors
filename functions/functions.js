@@ -121,10 +121,12 @@ const playMove = (gameID, playerName, move) => {
     const foundGame = getGame(gameID);
     const foundPlayer = getPlayer(foundGame, playerName);
     if (foundPlayer.move !== "") {
-        return "Player already played a move!";
+        throw new Error("Player already played a move!");
     }
     if (!allowedMoves.includes(move)) {
-        return "Player tried to play an illegal move, check your spelling and try again!";
+        throw new Error(
+            `Player tried to play an illegal move, check your spelling and try again! The allowed moves are: ${allowedMoves}`
+        );
     }
     foundPlayer.move = move;
     return `${playerName} played ${move}!`;
@@ -142,8 +144,9 @@ const calculateResult = (gameID, playerName) => {
     const opponent = getPlayer(foundGame, playerName, true);
     for (const player of foundGame.players) {
         if (player.move == "" || foundGame.players.length !== 2) {
-            //maybe not hardcode 2
-            return "All players need to play a move before the results can be calculated!";
+            throw new Error(
+                "All players need to play a move before the results can be calculated!"
+            );
         }
     }
     const playerMove = foundPlayer.move;
