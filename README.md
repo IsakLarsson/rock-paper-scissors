@@ -81,6 +81,24 @@ Success response example:
 }
 ```
 ### GET /api/games/{id}
-This returns a specific game object containing its players and their moves, this does not require a request body
+This returns a specific game object containing its players and their moves. If only one player has made their move, that move will be hidden in the response to prevent cheating. If both players have made their move, a winner will be crowned and the result will be sent back in the response. This call does not require a request body
 
-### Get /api/games
+Response example:
+```JSON
+{
+    "message": "Getting game by id cf48eb71-9cb1-4781-b4c1-84bd7f0fb60e",
+    "game": {
+        "id": "cf48eb71-9cb1-4781-b4c1-84bd7f0fb60e",
+        "players": [
+            {
+                "name": "Isak",
+                "move": "--HIDDEN--"
+            },
+            {
+                "name": "Kalle",
+                "move": ""
+            }
+        ]
+    }
+}
+```
