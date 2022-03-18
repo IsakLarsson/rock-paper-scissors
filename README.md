@@ -1,7 +1,7 @@
 # Rock Paper Scissors
 A simple application for playing rock-paper-scissors over HTTP
 
-Do you have a friend or colleague who you disagree with? This is the adult way of settling your differences, nothing else matters but the results of this game. It's a game of **rock-paper-scissors**. Sudden death, one game determines the winner.
+Do you have a friend or colleague who you disagree with? Time to settle your differences like adults, nothing else matters but the results of this game. It's a game of **rock-paper-scissors**. Sudden death, one game determines the winner.
 
 ## The rules
 The rules are very simple, each player chooses one move: Rock, Paper or Scissors.  
