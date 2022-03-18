@@ -25,8 +25,8 @@ You can now proceed to make calls to the API using your preferred API testing so
 3. Player 2 joins the game using the game ID
 4. Player 1 plays his/her move (Paper)
 5. Player 2 plays his/her move (Rock)
-6. Player 1 checks the results of the match and discovers that he/she has lost and is forever in shame
-7. Player 2 checks the results of the match and discovers that he/she won and lives forever in glory
+6. Player 1 checks the results of the match and discovers that he/she won and lives forever in glory 
+7. Player 2 checks the results of the match and discovers that he/she has lost and is forever in shame
 
 
 
