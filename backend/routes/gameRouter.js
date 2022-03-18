@@ -5,17 +5,10 @@ const {
     assurePlayerName,
     assureFields,
 } = require("../middleware/validationMiddleware");
-
-router.get("/games", gameController.getGames);
+/* 
+router.get("/games", gameController.getGames); */
 
 router.get("/games/:id", gameController.getGameByID);
-
-router.get(
-    "/games/:id/results",
-    assureFields(["name"]),
-    assurePlayerName,
-    gameController.getResults
-);
 
 router.post(
     "/games",

@@ -133,40 +133,59 @@ const playMove = (gameID, playerName, move) => {
 };
 
 /**
- * Calculates the result of a given game and returns the response
+ * Calculates the result of a given game and returns the result
  * @param {string} gameID
  * @param {string} playerName    The player who checks the results
  * @returns A message containing the result of the game
  */
-const calculateResult = (gameID, playerName) => {
+const calculateResult = (gameID) => {
     const foundGame = getGame(gameID);
-    const foundPlayer = getPlayer(foundGame, playerName);
-    const opponent = getPlayer(foundGame, playerName, true);
+    const player1 = foundGame.players[0];
+    const player2 = foundGame.players[1];
+
+    if (player1.move === player2.move) {
+        return "It's a draw!";
+    } else if (winningMoves[player1.move] === player2.move) {
+        return `${player1.name} played ${player1.move} and WON against ${player2.name}'s ${player2.move}!!`;
+    }
+    return `${player1.name} played ${player1.move} and LOST to ${player2.name}'s ${player2.move}!`;
+};
+
+/**
+ * Checks if both players have made a move in a given game
+ * @param {string} gameID
+ * @returns true if they have both played, false otherwise
+ */
+const bothPlayersPlayed = (gameID) => {
+    const foundGame = getGame(gameID);
     for (const player of foundGame.players) {
         if (player.move == "" || foundGame.players.length !== 2) {
-            throw new Error(
-                "All players need to play a move before the results can be calculated!"
-            );
+            return false;
         }
     }
-    const playerMove = foundPlayer.move;
-    const opponentMove = opponent.move;
+    return true;
+};
 
-    if (winningMoves[playerMove] == opponentMove) {
-        return "You win!";
-    } else if (playerMove == opponentMove) {
-        return "It's a draw!";
+/**
+ * Creates a copy of the given game which has the moves of the players hidden
+ * @param {Object} game Game object
+ * @returns a game object with a "hidden" move field
+ */
+const hidePlayerMoves = (game) => {
+    const returnGame = JSON.parse(JSON.stringify(game));
+    for (const player of returnGame.players) {
+        if (player.move !== "") {
+            player.move = "--HIDDEN--";
+        }
     }
-    return "You lose! :(";
-
-    /*  if (foundGame.players.map((player) => player.move === "")) {
-        return "All players need to play a move before the results can be calculated!";
-    } */
+    return returnGame;
 };
 
 module.exports = {
+    bothPlayersPlayed,
     calculateResult,
     createGame,
+    hidePlayerMoves,
     gameIDExists,
     gamesExist,
     getGame,

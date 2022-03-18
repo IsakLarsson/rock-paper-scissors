@@ -1,7 +1,8 @@
-const { gameList } = require("../assets/game");
 const {
+    bothPlayersPlayed,
     calculateResult,
     createGame,
+    hidePlayerMoves,
     gameIDExists,
     gamesExist,
     getGame,
@@ -12,27 +13,12 @@ const {
 } = require("../functions/functions");
 
 /**
- * Gets the currently active games if there are any.
- * @param {*} req   HTTP request
- * @param {*} res   HTTP response
- */
-const getGames = (req, res) => {
-    if (gamesExist(gameList)) {
-        res.json({ message: "Getting games", res: gameList });
-    } else {
-        res.status(404);
-        throw new Error("No games found");
-    }
-};
-
-/**
  * Creates a new game of rock-paper-scissors and adds the first player
  * @param {*} req   HTTP request
  * @param {*} res   HTTP response
  */
 const newGame = (req, res) => {
     const playerName = req.body.name;
-
     const createdID = createGame(playerName);
     res.status(201).json({ message: `Created new game with ID: ${createdID}` });
 };
@@ -45,9 +31,17 @@ const newGame = (req, res) => {
 const getGameByID = (req, res) => {
     const gameID = req.params.id;
     checkGameID(gameID, res);
+
+    if (!bothPlayersPlayed(gameID)) {
+        return res.json({
+            message: `Getting game by id ${req.params.id}`,
+            game: hidePlayerMoves(getGame(gameID)),
+        });
+    }
     res.json({
         message: `Getting game by id ${req.params.id}`,
-        res: getGame(gameID),
+        result: calculateResult(gameID),
+        game: getGame(gameID),
     });
 };
 
@@ -98,27 +92,6 @@ const makeMove = (req, res) => {
     }
 };
 
-/**
- * Gets the results of a given game
- * @param {*} req   HTTP request
- * @param {*} res   HTTP response
- */
-const getResults = (req, res) => {
-    const gameID = req.params.id;
-    const playerName = req.body.name;
-
-    checkGameID(gameID, res);
-    checkPlayerExists(gameID, playerName, res);
-    try {
-        const result = calculateResult(gameID, playerName);
-        res.json({ message: result });
-    } catch (err) {
-        //same thing here, is this really the appropriate status code?
-        res.status(400);
-        throw err;
-    }
-};
-
 //Small helper functions for cleaner code
 
 function checkGameID(gameID, res) {
@@ -135,10 +108,9 @@ function checkPlayerExists(gameID, playerName, res) {
 }
 
 module.exports = {
-    getGames,
+    // getGames,
     getGameByID,
     newGame,
     joinGameByID,
     makeMove,
-    getResults,
 };
