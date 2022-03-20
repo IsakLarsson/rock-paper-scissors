@@ -4,7 +4,6 @@ const {
     createGame,
     hidePlayerMoves,
     gameIDExists,
-    gamesExist,
     getGame,
     joinGame,
     playMove,
@@ -86,7 +85,6 @@ const makeMove = (req, res) => {
         const moveResults = playMove(gameID, playerName, move);
         res.json({ message: moveResults });
     } catch (err) {
-        //a different status code maybe? isn't really a client issue
         res.status(400);
         throw err;
     }
@@ -108,7 +106,6 @@ function checkPlayerExists(gameID, playerName, res) {
 }
 
 module.exports = {
-    // getGames,
     getGameByID,
     newGame,
     joinGameByID,

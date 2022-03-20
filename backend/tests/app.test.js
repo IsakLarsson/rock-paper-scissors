@@ -1,28 +1,16 @@
 const request = require("supertest");
 const app = require("../app.js");
 
-const mockGameList = [
-    {
-        id: "1234",
-        players: [
-            {
-                name: "Isak",
-                move: "--HIDDEN--",
-            },
-            {
-                name: "Kalle",
-                move: "",
-            },
-        ],
-    },
-];
-
+/**
+ * Very basic testing of API endpoints
+ */
 describe("Game API", () => {
-    test("POST /api/games --> Returns a new game ID", async () => {
+    test("POST /api/games --> Creates a new game", async () => {
         const response = await request(app)
             .post("/api/games")
             .send({ name: "playername" });
         expect(response.statusCode).toBe(201);
+        expect(response.body.message).toContain("Created new game");
     });
 
     test("POST /api/games with invalid body should get 400 response", async () => {
@@ -59,22 +47,19 @@ describe("Game API", () => {
         );
     });
 
-    test("POST /api/games/{id}/join with invalid ID should get 404 response", async () => {
+    test("GET /api/games/{id}/join with invalid ID should get 404 response", async () => {
         const response = await request(app)
-            .post("/api/games/1234")
+            .get("/api/games/1234")
             .send({ name: "playername" });
         expect(response.statusCode).toBe(404);
     });
 
-    /* 
-    test("should be 3", () => {
-        expect(1 + 3).toBe(4);
-        done();
-    }); */
-
-    /*     it("GET /games/id --> 404 if not found", () => {
-        return request(index).get("/games/11111").expect(404);
+    test("GET /api/games/{id} should get a specific game", async () => {
+        const postResponse = await request(app)
+            .post("/api/games")
+            .send({ name: "player" });
+        const gameID = postResponse.body.message.split(":")[1].trim();
+        const getResponse = await request(app).get(`/api/games/${gameID}`);
+        expect(getResponse.statusCode).toBe(200);
     });
-
-    it("POST /games --> creates a new game and returns ID", () => {}); */
 });
