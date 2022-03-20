@@ -102,7 +102,7 @@ Response example:
     }
 }
 ```
-Result example
+Result example:
 ```JSON
 {
     "message": "Getting game by id ce6c7d30-2052-4b98-b13e-3619be7cf9f5",
