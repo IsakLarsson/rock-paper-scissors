@@ -102,3 +102,23 @@ Response example:
     }
 }
 ```
+Result example:
+```JSON
+{
+    "message": "Getting game by id ce6c7d30-2052-4b98-b13e-3619be7cf9f5",
+    "result": "Isak played Rock and WON against Kalle's Paper!!",
+    "game": {
+        "id": "ce6c7d30-2052-4b98-b13e-3619be7cf9f5",
+        "players": [
+            {
+                "name": "Isak",
+                "move": "Rock"
+            },
+            {
+                "name": "Kalle",
+                "move": "Paper"
+            }
+        ]
+    }
+}
+```
